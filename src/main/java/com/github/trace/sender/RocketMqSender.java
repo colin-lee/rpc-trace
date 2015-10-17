@@ -39,7 +39,7 @@ public class RocketMqSender implements Runnable {
     NamedThreadFactory factory = new NamedThreadFactory("trace-mq-sender", true);
     executor = Executors.newSingleThreadExecutor(factory);
     executor.submit(this);
-    ConfigFactory.getInstance().getConfig("", new IChangeListener() {
+    ConfigFactory.getInstance().getConfig("rocketmq-sender", new IChangeListener() {
       @Override
       public void changed(IConfig config) {
         reload(config);
