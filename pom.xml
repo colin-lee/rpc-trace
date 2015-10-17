@@ -6,6 +6,7 @@
 
     <groupId>com.github.colin-lee</groupId>
     <artifactId>rpc-trace</artifactId>
+    <name>rpc-trace</name>
     <version>1.0.0</version>
     <url>https://github.com/colin-lee/rpc-trace</url>
     <description>trace rpc context</description>
