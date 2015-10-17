@@ -10,6 +10,7 @@ import com.github.autoconf.ConfigFactory;
 import com.github.autoconf.api.IChangeListener;
 import com.github.autoconf.api.IConfig;
 import com.github.trace.NamedThreadFactory;
+import com.google.common.base.Strings;
 import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +37,7 @@ public class RocketMqSender implements Runnable {
   }
 
   private RocketMqSender() {
-    NamedThreadFactory factory = new NamedThreadFactory("trace-mq-sender", true);
+    NamedThreadFactory factory = new NamedThreadFactory("rocketmq-sender", true);
     executor = Executors.newSingleThreadExecutor(factory);
     executor.submit(this);
     ConfigFactory.getInstance().getConfig("rocketmq-sender", new IChangeListener() {
@@ -52,13 +53,19 @@ public class RocketMqSender implements Runnable {
       public void run() {
         running = false;
         executor.shutdown();
-        sender.shutdown();
+        if (sender != null) {
+          sender.shutdown();
+        }
       }
     }));
   }
 
   private void reload(IConfig config) {
     String nameSrv = config.get("NAMESRV_ADDR");
+    if (Strings.isNullOrEmpty(nameSrv)) {
+      LOG.error("cannot find NAMESRV_ADDR in {}", config.getName());
+      return;
+    }
     System.setProperty(MixAll.NAMESRV_ADDR_PROPERTY, nameSrv);
     if (sender == null) {
       sender = new DefaultMQProducer();
