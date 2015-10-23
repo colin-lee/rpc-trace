@@ -15,7 +15,7 @@ import com.google.common.collect.Queues;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -25,16 +25,11 @@ import java.util.concurrent.Executors;
  */
 public class RocketMqSender implements Runnable {
   private static final Logger LOG = LoggerFactory.getLogger(RocketMqSender.class);
-  private final ConcurrentLinkedQueue<Message> queue = Queues.newConcurrentLinkedQueue();
+  private static final RocketMqSender INSTANCE = new RocketMqSender();
+  private final BlockingQueue<Message> queue = Queues.newArrayBlockingQueue(5000);
   private ExecutorService executor;
   private DefaultMQProducer sender;
   private boolean running;
-
-  private static final RocketMqSender INSTANCE = new RocketMqSender();
-
-  public static RocketMqSender getInstance() {
-    return INSTANCE;
-  }
 
   private RocketMqSender() {
     NamedThreadFactory factory = new NamedThreadFactory("rocketmq-sender", true);
@@ -58,6 +53,10 @@ public class RocketMqSender implements Runnable {
         }
       }
     }));
+  }
+
+  public static RocketMqSender getInstance() {
+    return INSTANCE;
   }
 
   private void reload(IConfig config) {
@@ -86,7 +85,13 @@ public class RocketMqSender implements Runnable {
   public void run() {
     running = true;
     while (running) {
-      Message msg = queue.poll();
+      Message msg;
+      try {
+        msg = queue.take();
+      } catch (InterruptedException e) {
+        LOG.error("interrupted, now exit");
+        return;
+      }
       if (msg == null || sender == null) {
         continue;
       }
@@ -111,6 +116,8 @@ public class RocketMqSender implements Runnable {
   }
 
   public void asyncSend(Message m) {
-    queue.add(m);
+    if (sender != null) {
+      queue.add(m);
+    }
   }
 }
