@@ -1,5 +1,7 @@
 package com.github.trace.bean;
 
+import java.util.Date;
+
 /**
  * RPC调用信息
  * Created by lirui on 2015-10-14 14:29.
@@ -31,6 +33,10 @@ public class RpcStatBean extends BaseStatBean {
 
   public void setStamp(long stamp) {
     this.stamp = stamp;
+  }
+
+  public Date getStartTime() {
+    return new Date(stamp);
   }
 
   public String getModule() {

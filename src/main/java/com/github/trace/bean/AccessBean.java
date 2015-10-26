@@ -1,6 +1,7 @@
 package com.github.trace.bean;
 
 import java.io.Serializable;
+import java.util.Date;
 
 /**
  * 页面访问
@@ -29,6 +30,10 @@ public class AccessBean implements Serializable{
 
   public void setStamp(long stamp) {
     this.stamp = stamp;
+  }
+
+  public Date getStartTime() {
+    return new Date(stamp);
   }
 
   public int getCost() {

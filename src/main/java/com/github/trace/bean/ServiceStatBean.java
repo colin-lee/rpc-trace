@@ -1,5 +1,7 @@
 package com.github.trace.bean;
 
+import java.util.Date;
+
 /**
  * 服务调用信息
  * Created by lirui on 2015-10-14 14:30.
@@ -31,6 +33,10 @@ public class ServiceStatBean extends BaseStatBean {
 
   public void setStamp(long stamp) {
     this.stamp = stamp;
+  }
+
+  public Date getStartTime() {
+    return new Date(stamp);
   }
 
   public String getModule() {
