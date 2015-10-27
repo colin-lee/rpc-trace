@@ -2,6 +2,8 @@ package com.github.trace;
 
 import com.google.common.base.Strings;
 
+import java.util.Date;
+
 /**
  * Trace信息
  * Created by lirui on 2015-10-13 17:54.
@@ -59,6 +61,10 @@ public class TraceContext {
     return this;
   }
 
+  public Date getStartTime() {
+    return new Date(stamp);
+  }
+
   public long getCost() {
     return cost;
   }
@@ -108,13 +114,13 @@ public class TraceContext {
     return iface;
   }
 
-  public TraceContext setIface(Class<?> iface) {
-    this.iface = iface.getSimpleName();
+  public TraceContext setIface(String iface) {
+    this.iface = iface;
     return this;
   }
 
-  public TraceContext setIface(String iface) {
-    this.iface = iface;
+  public TraceContext setIface(Class<?> iface) {
+    this.iface = iface.getSimpleName();
     return this;
   }
 
