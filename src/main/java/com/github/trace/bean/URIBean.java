@@ -7,7 +7,6 @@ import java.util.Date;
 
 /**
  * 页面信息上报的bean对象，主要用于观察页面pv以及反爬虫的效果
- * <p/>
  * Created by colinli on 14-2-21.
  */
 public class URIBean implements Serializable {
@@ -33,7 +32,7 @@ public class URIBean implements Serializable {
    */
   private int spiderPv;
   /**
-   * 返回码>400的pv
+   * 返回码&gt;400的pv
    */
   private int failPv;
 
