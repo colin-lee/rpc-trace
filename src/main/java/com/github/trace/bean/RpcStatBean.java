@@ -1,5 +1,7 @@
 package com.github.trace.bean;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
 import java.util.Date;
 
 /**
@@ -35,6 +37,7 @@ public class RpcStatBean extends BaseStatBean {
     this.stamp = stamp;
   }
 
+  @JSONField(serialize = false)
   public Date getStartTime() {
     return new Date(stamp);
   }
