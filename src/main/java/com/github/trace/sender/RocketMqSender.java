@@ -67,7 +67,7 @@ public class RocketMqSender implements Runnable {
     }
     System.setProperty(MixAll.NAMESRV_ADDR_PROPERTY, nameSrv);
     if (sender == null) {
-      sender = new DefaultMQProducer();
+      sender = new DefaultMQProducer("OssProducer");
       sender.setNamesrvAddr(nameSrv);
       try {
         sender.start();
@@ -81,8 +81,29 @@ public class RocketMqSender implements Runnable {
     }
   }
 
+  void doSend(Message msg) {
+    SendResult sendResult = null;
+    try {
+      sendResult = sender.send(msg);
+    } catch (Exception e) {
+      LOG.error("Send error, {}", msg, e);
+      e.printStackTrace();
+    }
+    if (sendResult == null) {
+      LOG.error("sendResult=null");
+    } else {
+      SendStatus status = sendResult.getSendStatus();
+      if (status.equals(SendStatus.SEND_OK)) {
+        LOG.debug("msgId={}, status={}", sendResult.getMsgId(), status);
+      } else {
+        LOG.error("msgId={}, status={}", sendResult.getMsgId(), status);
+      }
+    }
+  }
+
   @Override
   public void run() {
+    LOG.info("{} started", Thread.currentThread().getName());
     running = true;
     while (running) {
       Message msg;
@@ -95,29 +116,13 @@ public class RocketMqSender implements Runnable {
       if (msg == null || sender == null) {
         continue;
       }
-      SendResult sendResult = null;
-      try {
-        sendResult = sender.send(msg);
-      } catch (Exception e) {
-        LOG.error("Send error, {}", msg, e);
-        e.printStackTrace();
-      }
-      if (sendResult == null) {
-        LOG.error("sendResult=null");
-      } else {
-        SendStatus status = sendResult.getSendStatus();
-        if (status.equals(SendStatus.SEND_OK)) {
-          LOG.debug("msgId={}, status={}", sendResult.getMsgId(), status);
-        } else {
-          LOG.error("msgId={}, status={}", sendResult.getMsgId(), status);
-        }
-      }
+      doSend(msg);
     }
   }
 
   public void asyncSend(Message m) {
     if (sender != null) {
-      queue.add(m);
+      queue.offer(m);
     }
   }
 }

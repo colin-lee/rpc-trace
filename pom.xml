@@ -27,7 +27,7 @@
         <encoding>UTF-8</encoding>
         <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
         <spring.version>4.2.1.RELEASE</spring.version>
-        <junit.version>4.11</junit.version>
+        <junit.version>4.12</junit.version>
         <jdk.version>1.7</jdk.version>
     </properties>
 
@@ -47,6 +47,11 @@
             <groupId>com.github.colin-lee</groupId>
             <artifactId>config-core</artifactId>
             <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>${junit.version}</version>
         </dependency>
     </dependencies>
     <build>
