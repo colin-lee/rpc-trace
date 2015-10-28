@@ -67,7 +67,7 @@ public class RocketMqSender implements Runnable {
     }
     System.setProperty(MixAll.NAMESRV_ADDR_PROPERTY, nameSrv);
     if (sender == null) {
-      sender = new DefaultMQProducer();
+      sender = new DefaultMQProducer("OssMqSender");
       sender.setNamesrvAddr(nameSrv);
       try {
         sender.start();
@@ -78,6 +78,26 @@ public class RocketMqSender implements Runnable {
       sender.setNamesrvAddr(nameSrv);
       sender.getDefaultMQProducerImpl().getmQClientFactory().getDefaultMQProducer().setNamesrvAddr(nameSrv);
       sender.getDefaultMQProducerImpl().getmQClientFactory().getMQClientAPIImpl().updateNameServerAddressList(nameSrv);
+    }
+  }
+
+  void doSend(Message msg) {
+    SendResult sendResult = null;
+    try {
+      sendResult = sender.send(msg);
+    } catch (Exception e) {
+      LOG.error("Send error, {}", msg, e);
+      e.printStackTrace();
+    }
+    if (sendResult == null) {
+      LOG.error("sendResult=null");
+    } else {
+      SendStatus status = sendResult.getSendStatus();
+      if (status.equals(SendStatus.SEND_OK)) {
+        LOG.debug("msgId={}, status={}", sendResult.getMsgId(), status);
+      } else {
+        LOG.error("msgId={}, status={}", sendResult.getMsgId(), status);
+      }
     }
   }
 
@@ -95,23 +115,7 @@ public class RocketMqSender implements Runnable {
       if (msg == null || sender == null) {
         continue;
       }
-      SendResult sendResult = null;
-      try {
-        sendResult = sender.send(msg);
-      } catch (Exception e) {
-        LOG.error("Send error, {}", msg, e);
-        e.printStackTrace();
-      }
-      if (sendResult == null) {
-        LOG.error("sendResult=null");
-      } else {
-        SendStatus status = sendResult.getSendStatus();
-        if (status.equals(SendStatus.SEND_OK)) {
-          LOG.debug("msgId={}, status={}", sendResult.getMsgId(), status);
-        } else {
-          LOG.error("msgId={}, status={}", sendResult.getMsgId(), status);
-        }
-      }
+      doSend(msg);
     }
   }
 
