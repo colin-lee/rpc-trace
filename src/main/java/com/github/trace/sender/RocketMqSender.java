@@ -87,7 +87,6 @@ public class RocketMqSender implements Runnable {
       sendResult = sender.send(msg);
     } catch (Exception e) {
       LOG.error("Send error, {}", msg, e);
-      e.printStackTrace();
     }
     if (sendResult == null) {
       LOG.error("sendResult=null");
